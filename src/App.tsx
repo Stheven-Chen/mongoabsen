@@ -12,9 +12,9 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/test" element={<Login setNames={setNames} username={username} setUsername={setUsername} setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/test/absen" element={isLoggedIn ? <Absen names={names} username={username} /> : <Navigate to="/test" />} />
-        <Route path="/test/admin" element={isLoggedIn ? <Admin/> : <Navigate to="/test" />} />
+        <Route path="/" element={<Login setNames={setNames} username={username} setUsername={setUsername} setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/absen" element={isLoggedIn ? <Absen names={names} username={username} /> : <Navigate to="/" />} />
+        <Route path="/admin" element={isLoggedIn ? <Admin/> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );
