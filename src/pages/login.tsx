@@ -22,6 +22,7 @@ const Login: React.FC<LoginProps> = ({ setNames, username, setUsername , setIsLo
       const data = await res.json();
       const trimUsername = username.trim().toLowerCase();
       const filterUser = data.find((item: { user: string }) => item.user === trimUsername);
+      setUsername(trimUsername)
 
       if (!filterUser) {
         setError('Username yang dimasukkan salah.');
