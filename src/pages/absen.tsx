@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AbsenBtn, Alert, NavbarAbsen, Table } from '../component/ui';
+import { AbsenBtn, Alert, NavbarAbsen, Table, ModalAttendance } from '../component/ui';
 import * as XLSX from "xlsx";
 import saveAs from "file-saver";
 
@@ -14,6 +14,8 @@ const Absen: React.FC<AbsenProps> = ({ names, username }) => {
   const [alert, setAlert] = useState<String>("");
   const [alertHeader, setAlertHeader] = useState<String>("");
   const [resetPop, setResetPop] = useState<string>("")
+  const [modal, setModal] = useState<Boolean>(false);
+  const [reason,setReason] = useState<string>('')
 
   const options = {
     hour12: false, // Setel ke false untuk format 24 jam
@@ -45,6 +47,7 @@ const Absen: React.FC<AbsenProps> = ({ names, username }) => {
   };
   useEffect(() => {
     getAbsen();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const timeIn = async () => {
@@ -132,10 +135,64 @@ const Absen: React.FC<AbsenProps> = ({ names, username }) => {
     }
   }
   
-  const resetConfirmation = async () =>{
-    setResetPop("Yakin Reset?")
-  }
+  // const resetConfirmation = async () =>{
+  //   setResetPop("Yakin Reset?")
+  // }
   
+  const pilihan = async () =>{
+    setModal(true);
+  }
+
+  const handelModalAttendance = async () =>{
+    console.log(`ini dari klik, nilai reason adalah ${reason}`)
+    const date = new Date().toISOString().split('T')[0];
+    try{
+      const timeIn = reason;
+    const timeOut = reason;
+    const body ={
+      date,
+      timeIn,
+      timeOut
+    }
+    const response = await fetch(`https://server-production-9d59.up.railway.app/timein/${username}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (response.status === 200) {
+      if (reason === 'sakit') {
+        setAlertHeader("😟");
+        setAlert("Get well soon");
+      } else if (reason === 'izin') {
+        setAlertHeader("👍");
+        setAlert("OK");
+      } else if (reason === 'cuti bersama' || reason === 'libur') {
+        setAlertHeader("OK");
+        setAlert("Happy weekend");
+      }
+      // Tampilkan pesan OK jika status respons adalah 200
+      await getAbsen()
+    } else {
+      const errorText = await response.text();
+      setAlertHeader('☹')
+      setAlert(`Error: ${errorText}`); // Tampilkan pesan error jika status respons bukan 200
+    }
+
+    console.log(JSON.stringify(body, null, 2));
+    setModal(false);
+   
+    }catch(e){
+      console.error(e)
+    }
+  }
+
+  const onInput = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setReason(event.target.value);
+    console.log(reason)
+  };
     
  
   
@@ -219,9 +276,13 @@ const Absen: React.FC<AbsenProps> = ({ names, username }) => {
           text="Download"
           onClick={generateExcelFile} 
           btnW='200'/>
-      <AbsenBtn
+      {/* <AbsenBtn
           text="Reset Attendance"
           onClick={resetConfirmation} 
+          btnW='200'/> */}
+      <AbsenBtn
+          text="Absent"
+          onClick={pilihan} 
           btnW='200'/>
       </div>
 
@@ -230,6 +291,13 @@ const Absen: React.FC<AbsenProps> = ({ names, username }) => {
             setAlert('')
             setAlertHeader('')
           }}/>}
+
+      {modal && <ModalAttendance
+      onClick={handelModalAttendance}
+      onInput={onInput}
+      value={reason}
+      onCancel={()=>setModal(false)}
+      />}
     </div>
   );
 };

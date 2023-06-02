@@ -33,6 +33,13 @@ interface absenBtnProp{
   btnW: String;
 }
 
+interface AttendaceProp{
+  onClick: () => void;
+  onCancel: ()=> void;
+  onInput: any;
+  value: string;
+}
+
 const Button: React.FC<buttonProp> = ({ type, onClick, buttonText, className }) => {
   const buttonClassName = `bg-sky-500 h-10 w-20 m-4 py-2 text-white font-medium hover:bg-sky-600 rounded-xl shadow-sm ${className}`;
 
@@ -81,7 +88,7 @@ const Alert: React.FC<modalAlert> = ({text, onClick, header, onCancel})=>{
 
 const Overlay: React.FC<{ text: string }> = ({ text }) => {
   return (
-    <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed top-0 left-0 w-screen h-screen z-50 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="flex flex-col items-center text-white">
         <svg className="animate-spin h-16 w-16 text-white mb-4" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -142,4 +149,28 @@ const AbsenBtn: React.FC<absenBtnProp> = ({text, onClick, btnW})=>{
   );
 };
 
-export { Button, Navbar, Alert, Overlay, NavbarAbsen, Table, AbsenBtn };
+const ModalAttendance: React.FC<AttendaceProp> = ({onClick, onCancel, onInput, value}) =>{
+  return(
+    <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gray-600 bg-opacity-50">
+      <div className="bg-white rounded-lg w-80 h-48 overflow-hidden flex flex-col justify-center items-center">
+        <span className="font-bold text-2xl text-center text-dark">Kenapa?</span>
+
+        <label htmlFor="reason" className='block mb-2 font-medium text-gray-700 '></label>
+        <select  value={value} onInput={onInput} name="reason" id="reason" className='w-18 px-4 py-2 border border-gray-300 rounded-md foucs:outline-none focus:bordedr-indigo-500'>
+          <option value="">Pilih Alasan</option>
+          <option value="sakit">Sakit</option>
+          <option value="izin">Izin</option>
+          <option value="libur">Libur</option>
+          <option value="cuti bersama">Cuti Bersama</option>
+
+        </select>
+        <div className='flex gap-4'>
+          <button className="font-bold text-white h-8 w-28 mt-5 rounded-full bg-sky-500" onClick={onClick}>Ok</button> 
+          <button className="font-bold text-white h-8 w-28 mt-5 rounded-full bg-yellow-500" onClick={onCancel}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { Button, Navbar, Alert, Overlay, NavbarAbsen, Table, AbsenBtn, ModalAttendance };
